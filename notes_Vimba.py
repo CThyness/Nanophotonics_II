@@ -10,6 +10,7 @@ from vimba import Camera, Frame, FrameStatus      # Camera libraries
 from vimba import Vimba
 from time import sleep
 import numpy as np
+from PIL import Image
 
 framQueue = []
 
@@ -36,7 +37,7 @@ def frame_handler(cam: Camera, frame: Frame):
 with Vimba.get_instance() as vimb:
     with vimb.get_all_cameras()[0] as cameraWS:
         
-        cameraWS.get_feature_by_name('PixelFormat').set('Mono8')
+        cameraWS.get_feature_by_name('PixelFormat').set('Mono16')
         
         # # Set camera properties WS
         # cameraWS.get_feature_by_name('Height').set()
@@ -49,8 +50,14 @@ with Vimba.get_instance() as vimb:
         # Pause for camera
         sleep(1)
         
-        cameraWS.start_streaming(handler=frame_handler, buffer_count=10)
-        
+        # cameraWS.start_streaming(handler=frame_handler, buffer_count=10)
+        for frame in cameraWS.get_frame_generator(limit=10): #Takes 10 images and saves each as a .tiff file
+            f = frame.as_numpy_ndarray()
+            f = f.reshape((768,1024))
+            im = Image.fromarray(f)
+            im.save('test.tif')
+
+
         # Pause for camera
         sleep(0.3)
         
