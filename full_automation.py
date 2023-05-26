@@ -105,12 +105,12 @@ with Vimba.get_instance() as vimba:
                 stepper_y.wait_move()
                 sleep(1)
             #-------------------------------------------------------------------------------------
+            tl.KinesisMotor.move_by(stepper_y, -distance_bottom_to_top)
             print('Please switch over to IR')
             answer = ''
             while(answer != 'y'):
                 answer = input('If you have switched to IR type in y: ')
                 
-            tl.KinesisMotor.move_by(stepper_y, -distance_bottom_to_top)
             stepper_y.wait_move()
             sleep(1)
             for section in range(1, N_sections+1): #Taking all images with IR --------------------
@@ -129,7 +129,7 @@ with Vimba.get_instance() as vimba:
                     # avg += f
                     im = Image.fromarray(f)
                     im.save(path.join(folder_path, f'{i}.tif'))
-                    sleep(0.1)
+                    sleep(exposure_time_top_IR + 0.1) #To ensure that there is always enough sleep time between pictures
                 tl.KinesisMotor.move_by(stepper_y, distance_bottom_to_top//N_sections) #Moving down one section
                 stepper_y.wait_move()
                 sleep(1)
@@ -143,7 +143,7 @@ with Vimba.get_instance() as vimba:
             while(answer != 'y'):
                 answer = input('If you have switched to LED type in y: ')
 
-            #Taking one last image with LED to estimate drift ------------------------------------
+            #Taking one more image with LED at the top to estimate drift -------------------------
             folder_path = path.join(measurement_folder, date_folder, f'top_LED{N_sections}a_final')
             if(not path.exists(folder_path)):
                 makedirs(folder_path)
@@ -165,6 +165,25 @@ with Vimba.get_instance() as vimba:
             # im = Image.fromarray(avg)
             # im.save(path.join(folder_path, 'avg.tif'))
             #-------------------------------------------------------------------------------------
-            tl.KinesisMotor.move_by(stepper_y, -distance_bottom_to_top) #Moving down one section
+            #Taking one last image with LED at the bottom to estimate drift ----------------------
+            folder_path = path.join(measurement_folder, date_folder, f'top_LED1a_final')
+            if(not path.exists(folder_path)):
+                makedirs(folder_path)
+            tl.KinesisMotor.move_by(stepper_y, -distance_bottom_to_top) #Moving down to the start
+            stepper_y.wait_move()
+            sleep(1)
+
+            # avg = np.zeros((768,1024), np.float64)
+            for i in range(N_pictures): #Takes <N_pictures> images and saves each as a unique .tif file
+                frame = cam.get_frame()
+                f = frame.as_numpy_ndarray()
+                f = f.reshape((768,1024)) #Currently hardcoded the dimensions, should find a way to do this dynamically
+                # avg += f
+                im = Image.fromarray(f)
+                im.save(path.join(folder_path, f'{i}.tif'))
+                sleep(0.1)
+            # avg = avg/N_pictures
+            # im = Image.fromarray(avg)
+            # im.save(path.join(folder_path, 'avg.tif'))
             
 
