@@ -119,18 +119,15 @@ def main():
     measurement_folder = 'C:/Users/CopsLAB_Local/Documents/CJ_measurements'
     top_camera_ID = 'DEV_0xA4701110AF9B7'
     # front_camera_ID = 'DEV_0xA4701120BE706'
-    # exposure_time_front_IR = 500
-    # exposure_time_front_LED = 8000
 
     #Variables for stage movement
-    distance_bottom_to_top = 4500000
+    distance_bottom_to_top = 4500000 #Intentionally longer than necessary
     stepper_y = tl.KinesisMotor('26004964')
     # stepper_z = tl.KinesisMotor('26004967')
     #-------------------------------------------------------------------------------------------------
 
     #Variables that need to be changed----------------------------------------------------------------
     date_folder = '230526' #Just insert current date with format YYMMDD
-    # images_folder = '1a_IR' #Here write the current measurement being done
     N_pictures = 10 #Number of pictures you want to take
     N_sections = 20 #Number of sections you want to seperate the sample into
     exposure_time_top_IR = 250000
